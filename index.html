@@ -1,378 +1,137 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Miyagi food place - Food Ordering</title>
 
-<style>
-:root{--scene:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'%3E%3Cdefs%3E%3ClinearGradient id='w' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%234a3426'/%3E%3Cstop offset='1' stop-color='%232b1d15'/%3E%3C/linearGradient%3E%3CradialGradient id='g'%3E%3Cstop offset='0' stop-color='%23ffd58a' stop-opacity='.85'/%3E%3Cstop offset='1' stop-color='%23ffd58a' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='1200' height='600' fill='url(%23w)'/%3E%3Crect y='440' width='1200' height='160' fill='%231f140e'/%3E%3Cg fill='url(%23g)'%3E%3Ccircle cx='240' cy='150' r='140'/%3E%3Ccircle cx='600' cy='130' r='160'/%3E%3Ccircle cx='960' cy='150' r='140'/%3E%3C/g%3E%3Cpath d='M240 0V105M600 0V85M960 0V105' stroke='%23120b07' stroke-width='3'/%3E%3Cg fill='%23ffd58a'%3E%3Cpath d='M208 105h64l-12 38h-40z'/%3E%3Cpath d='M562 85h76l-14 42h-48z'/%3E%3Cpath d='M928 105h64l-12 38h-40z'/%3E%3C/g%3E%3Cg fill='%232f2018'%3E%3Crect x='100' y='400' width='26' height='110' rx='8'/%3E%3Crect x='354' y='400' width='26' height='110' rx='8'/%3E%3Crect x='460' y='410' width='26' height='120' rx='8'/%3E%3Crect x='714' y='410' width='26' height='120' rx='8'/%3E%3Crect x='820' y='400' width='26' height='110' rx='8'/%3E%3Crect x='1074' y='400' width='26' height='110' rx='8'/%3E%3C/g%3E%3Cg fill='%237a5439'%3E%3Cellipse cx='240' cy='470' rx='110' ry='20'/%3E%3Cellipse cx='600' cy='490' rx='130' ry='24'/%3E%3Cellipse cx='960' cy='470' rx='110' ry='20'/%3E%3C/g%3E%3Cpath d='M240 470V590M600 490V600M960 470V590' stroke='%237a5439' stroke-width='10'/%3E%3Cg fill='%23f3e6d3'%3E%3Cellipse cx='215' cy='462' rx='26' ry='6'/%3E%3Cellipse cx='265' cy='462' rx='26' ry='6'/%3E%3Cellipse cx='575' cy='480' rx='28' ry='7'/%3E%3Cellipse cx='625' cy='480' rx='28' ry='7'/%3E%3Cellipse cx='935' cy='462' rx='26' ry='6'/%3E%3Cellipse cx='985' cy='462' rx='26' ry='6'/%3E%3C/g%3E%3C/svg%3E")}
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial;background:#f5f5f5;color:#222}
-header{background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=70"),url("https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=70"),var(--scene),#124f34;background-size:cover;background-position:center;color:white;text-align:center;padding:60px 20px}
-header h1{margin:0 0 8px;text-shadow:0 2px 8px rgba(0,0,0,.6)}
-header p{margin:0;text-shadow:0 1px 6px rgba(0,0,0,.6)}
-nav{background:#124f34;padding:12px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
-a{color:#176b45}
-button,.btn{background:#176b45;color:white;border:0;padding:12px 16px;border-radius:6px;cursor:pointer}
-.btn{display:inline-block;text-decoration:none;font:13.33px Arial}
-nav button{background:white;color:#176b45}
-section{display:none;padding:20px;max-width:1000px;margin:auto}
-section.active{display:block}
-.hero{background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),url("https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1400&q=70"),url("https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?auto=format&fit=crop&w=1400&q=70"),var(--scene),#124f34;background-size:cover;background-position:center;color:white;text-align:center;padding:90px 15px;border-radius:12px}
-.hero h1{color:white;text-shadow:0 2px 8px rgba(0,0,0,.6)}
-.hero p{text-shadow:0 1px 6px rgba(0,0,0,.6)}
-.hero button{background:white;color:#176b45;font-weight:bold}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}
-.food{background:white;padding:12px;border-radius:10px;box-shadow:0 2px 7px #ddd}
-.food img{width:100%;height:150px;object-fit:cover;border-radius:8px}
-.price{color:#176b45;font-weight:bold}
-input,select,textarea{width:100%;padding:12px;margin:8px 0 15px;border:1px solid #ccc;border-radius:6px}
-.note{color:#555;font-size:14px;margin:-6px 0 15px}
-.cart-item{background:white;padding:12px;margin:10px 0;border-radius:8px}
-.total{font-size:20px;font-weight:bold}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#124f34;color:white;padding:10px 18px;border-radius:20px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:10}
-.toast.show{opacity:1}
-footer{background:#124f34;color:white;text-align:center;padding:20px;margin-top:30px}
-</style>
-</head>
+document.getElementById("orderForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
 
-<body>
+    if (cart.length === 0) {
+        toast("Your cart is empty");
+        showPage("menu");
+        return;
+    }
 
-<header>
-<h1>🍽️ Miyagi food place</h1>
-<p>Fresh, Delicious and Affordable Meals</p>
-</header>
+    const name = document.getElementById("customerName").value.trim();
+    const phone = document.getElementById("customerPhone").value.trim();
+    const type = document.getElementById("orderType").value;
+    const address = document.getElementById("address").value.trim();
+    const payment = document.getElementById("paymentMethod").value;
+    const total = getTotal();
 
-<nav>
-<button onclick="showPage('home')">Home</button>
-<button onclick="showPage('menu')">Food Menu</button>
-<button onclick="showPage('cart')">Cart (<span id="cartCount">0</span>)</button>
-<button onclick="showPage('checkout')">Checkout</button>
-</nav>
+    const orderId = "MY" + Date.now().toString().slice(-8);
 
-<!-- HOME -->
-<section id="home" class="active">
-<div class="hero">
-<h1>Welcome to Miyagi food place</h1>
-<p>Enjoy delicious meals prepared with care.</p>
-<button onclick="showPage('menu')">Order Now</button>
-</div>
+    const order = cart.map(item => {
+        const food = foods.find(f => f.id === item.id);
+        return food
+            ? `${food.name} x ${item.quantity} = KSh ${food.price * item.quantity}`
+            : "";
+    }).filter(Boolean).join("\n");
 
-<h2>About Us</h2>
-<p>Miyagi food place provides tasty and affordable food. Browse our menu and order your favourite meals.</p>
-
-<h2>Our Location</h2>
-<p>Marimanti, Tharaka-Nithi, Kenya</p>
-
-<h2>Contact Us</h2>
-<p>Phone: <a id="contactPhone" href="#"></a></p>
-</section>
-
-<!-- MENU -->
-<section id="menu">
-<h2>Our Food Menu</h2>
-<div class="grid" id="foodGrid"></div>
-</section>
-
-<!-- CART -->
-<section id="cart">
-<h2>My Shopping Cart</h2>
-<div id="cartItems"></div>
-<p class="total" id="cartTotal">Total: KSh 0</p>
-<button onclick="showPage('menu')">Continue Shopping</button>
-<button onclick="showPage('checkout')">Checkout</button>
-</section>
-
-<!-- CHECKOUT -->
-<section id="checkout">
-<h2>Checkout and Payment</h2>
-<div id="checkoutSummary"></div>
-
-<form id="orderForm">
-<label>Full Name</label>
-<input id="customerName" required placeholder="Enter your name">
-
-<label>Phone Number</label>
-<input id="customerPhone" required type="tel" placeholder="07XXXXXXXX">
-
-<label>Order Type</label>
-<select id="orderType">
-<option>Delivery</option>
-<option>Collection</option>
-</select>
-
-<div id="addressBox">
-<label>Delivery Address</label>
-<textarea id="address" placeholder="Enter your location"></textarea>
-</div>
-
-<label>Payment Method</label>
-<select id="paymentMethod">
-<option>M-Pesa</option>
-<option>Cash</option>
-<option>Bank Transfer</option>
-</select>
-<p class="note" id="paymentNote"></p>
-
-<button type="submit">Place Order on WhatsApp</button>
-</form>
-</section>
-
-<!-- ORDER SENT -->
-<section id="done">
-<h2>Almost done ✅</h2>
-<p>WhatsApp should now be open with your order ready. Tap <strong>Send</strong> in WhatsApp to place it.</p>
-<p><a class="btn" id="waLink" href="#" target="_blank" rel="noopener">Open WhatsApp again</a></p>
-<p>Your cart stays saved until you confirm below.</p>
-<button onclick="finishOrder()">I've sent my order</button>
-</section>
-
-<footer>
-<p>© 2026 Miyagi food place. All Rights Reserved.</p>
-<p>Fresh Food | Great Taste | Best Service</p>
-</footer>
-
-<div class="toast" id="toast"></div>
-
-<script>
-
-// CHANGE THESE TO YOUR REAL BUSINESS DETAILS
-const BUSINESS_WHATSAPP = "254713073559"; // digits only, with country code
-const MPESA_TILL = ""; // e.g. "123456" - leave empty until you have one
-
-const foods = [
-{id:1,name:"Mandazi",price:20,img:"https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500"},
-{id:2,name:"Coffee",price:80,img:"https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500"},
-{id:3,name:"Githeri",price:100,img:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500"},
-{id:4,name:"Samosa",price:50,img:"https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?w=500"},
-{id:5,name:"Ugali & Samaki",price:300,img:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500"},
-{id:6,name:"Vegetables",price:100,img:"https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500"}
-];
-
-let lastOrderUrl = "";
-let toastTimer;
-
-function loadCart(){
-try{
-const saved=JSON.parse(localStorage.getItem("miyagiCart")||"[]");
-if(!Array.isArray(saved))return [];
-return saved.filter(i=>i&&Number.isInteger(i.quantity)&&i.quantity>0&&foods.some(f=>f.id===i.id));
-}catch(e){
-return [];
-}
-}
-
-let cart = loadCart();
-
-function saveCart(){
-try{localStorage.setItem("miyagiCart",JSON.stringify(cart));}catch(e){}
-updateCart();
-}
-
-function toast(msg){
-const t=document.getElementById("toast");
-t.textContent=msg;
-t.classList.add("show");
-clearTimeout(toastTimer);
-toastTimer=setTimeout(()=>t.classList.remove("show"),1500);
-}
-
-function showPage(page){
-document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
-document.getElementById(page).classList.add("active");
-
-if(page==="cart") renderCart();
-if(page==="checkout") renderCheckout();
-
-window.scrollTo(0,0);
-}
-
-function renderMenu(){
-document.getElementById("foodGrid").innerHTML=foods.map(food=>`
-<div class="food">
-<img src="${food.img}" alt="${food.name}">
-<h3>${food.name}</h3>
-<p class="price">KSh ${food.price}</p>
-<button onclick="addToCart(${food.id})">Add to Cart</button>
-</div>
-`).join("");
-}
-
-function addToCart(id){
-let item=cart.find(x=>x.id===id);
-
-if(item){
-item.quantity++;
-}else{
-cart.push({id:id,quantity:1});
-}
-
-saveCart();
-toast(foods.find(f=>f.id===id).name+" added to cart");
-}
-
-function changeQuantity(id,amount){
-let item=cart.find(x=>x.id===id);
-if(!item)return;
-
-item.quantity+=amount;
-cart=cart.filter(x=>x.quantity>0);
-
-saveCart();
-renderCart();
-}
-
-function removeItem(id){
-cart=cart.filter(x=>x.id!==id);
-saveCart();
-renderCart();
-}
-
-function getTotal(){
-return cart.reduce((sum,item)=>{
-let food=foods.find(f=>f.id===item.id);
-return sum+(food ? food.price*item.quantity : 0);
-},0);
-}
-
-function updateCart(){
-document.getElementById("cartCount").textContent=
-cart.reduce((sum,item)=>sum+item.quantity,0);
-}
-
-function renderCart(){
-let container=document.getElementById("cartItems");
-
-if(cart.length===0){
-container.innerHTML="<p>Your cart is empty.</p>";
-}else{
-container.innerHTML=cart.map(item=>{
-let food=foods.find(f=>f.id===item.id);
-
-if(!food)return "";
-
-return `
-<div class="cart-item">
-<strong>${food.name}</strong><br>
-KSh ${food.price} × ${item.quantity}
-<p>
-<button onclick="changeQuantity(${food.id},1)">+</button>
-<button onclick="changeQuantity(${food.id},-1)">-</button>
-<button onclick="removeItem(${food.id})">Remove</button>
-</p>
-</div>
-`;
-}).join("");
-}
-
-document.getElementById("cartTotal").textContent=
-"Total: KSh "+getTotal();
-}
-
-function renderCheckout(){
-let summary=document.getElementById("checkoutSummary");
-
-if(cart.length===0){
-summary.innerHTML="<p>Your cart is empty. Please add food first.</p>";
-return;
-}
-
-summary.innerHTML=`
-<h3>Order Summary</h3>
-${cart.map(item=>{
-let food=foods.find(f=>f.id===item.id);
-return food ? `<p>${food.name} × ${item.quantity} = KSh ${food.price*item.quantity}</p>` : "";
-}).join("")}
-<p class="total">Total: KSh ${getTotal()}</p>
-`;
-}
-
-function toggleAddress(){
-const delivery=document.getElementById("orderType").value==="Delivery";
-document.getElementById("addressBox").style.display=delivery?"block":"none";
-document.getElementById("address").required=delivery;
-}
-
-function updatePaymentNote(){
-const method=document.getElementById("paymentMethod").value;
-let note="";
-
-if(method==="M-Pesa"){
-note=MPESA_TILL
-? "Pay via M-Pesa Till Number "+MPESA_TILL+", then send us the M-Pesa confirmation message on WhatsApp."
-: "We will confirm your order on WhatsApp and send the M-Pesa payment details.";
-}else if(method==="Cash"){
-note="Pay in cash when your order arrives or when you collect it.";
-}else{
-note="We will send our bank details on WhatsApp.";
-}
-
-document.getElementById("paymentNote").textContent=note;
-}
-
-function finishOrder(){
-cart=[];
-saveCart();
-document.getElementById("orderForm").reset();
-toggleAddress();
-updatePaymentNote();
-showPage("home");
-toast("Thank you for your order!");
-}
-
-document.getElementById("orderForm").addEventListener("submit",function(e){
-e.preventDefault();
-
-if(cart.length===0){
-toast("Your cart is empty");
-showPage("menu");
-return;
-}
-
-let name=document.getElementById("customerName").value.trim();
-let phone=document.getElementById("customerPhone").value.trim();
-let type=document.getElementById("orderType").value;
-let address=document.getElementById("address").value.trim();
-let payment=document.getElementById("paymentMethod").value;
-
-let order=cart.map(item=>{
-let food=foods.find(f=>f.id===item.id);
-return food ? `${food.name} x ${item.quantity} = KSh ${food.price*item.quantity}` : "";
-}).filter(Boolean).join("\n");
-
-let message=`NEW MIYAGI FOOD PLACE ORDER
+    const message = `NEW MIYAGI FOOD PLACE ORDER
+Order ID: ${orderId}
 Name: ${name}
 Customer Phone: ${phone}
 Order Type: ${type}
-Address: ${type==="Delivery" ? address : "N/A (collection)"}
+Address: ${type === "Delivery" ? address : "Collection"}
 Payment: ${payment}
 
 ORDER:
 ${order}
 
-TOTAL: KSh ${getTotal()}`;
+TOTAL: KSh ${total}`;
 
-lastOrderUrl="https://wa.me/"+BUSINESS_WHATSAPP+"?text="+encodeURIComponent(message);
+    // M-PESA PAYMENT
+    if (payment === "M-Pesa") {
 
-document.getElementById("waLink").href=lastOrderUrl;
-window.open(lastOrderUrl,"_blank");
-showPage("done");
+        toast("Sending M-Pesa payment request...");
+
+        try {
+            const response = await fetch(
+                "https://mpesa-stk-backend-4.onrender.com/stkpush",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        phone: phone,
+                        amount: total,
+                        orderId: orderId
+                    })
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok || result.success === false) {
+                throw new Error(result.message || "STK Push failed");
+            }
+
+            const checkoutId =
+                result.checkoutRequestId ||
+                result.data?.CheckoutRequestID ||
+                result.data?.checkoutRequestId;
+
+            if (!checkoutId) {
+                throw new Error("Payment request ID was not returned");
+            }
+
+            alert("Payment request sent! Check your phone and enter your M-Pesa PIN.");
+
+            // CHECK PAYMENT STATUS
+            for (let i = 0; i < 40; i++) {
+
+                await new Promise(resolve => setTimeout(resolve, 3000));
+
+                const statusResponse = await fetch(
+                    "https://mpesa-stk-backend-4.onrender.com/payment-status/" +
+                    encodeURIComponent(checkoutId)
+                );
+
+                const statusData = await statusResponse.json();
+
+                const status = String(statusData.status || "").toUpperCase();
+
+                if (status === "PAID") {
+
+                    lastOrderUrl =
+                        "https://wa.me/" +
+                        BUSINESS_WHATSAPP +
+                        "?text=" + encodeURIComponent(
+                            message + "\n\nPAYMENT: CONFIRMED"
+                        );
+
+                    document.getElementById("waLink").href = lastOrderUrl;
+
+                    document.querySelector("#done p").textContent =
+                        "M-Pesa payment confirmed! Tap below to send your order to Miyagi Food Place on WhatsApp.";
+
+                    showPage("done");
+                    return;
+                }
+
+                if (status === "FAILED") {
+                    alert("M-Pesa payment failed or was cancelled. Please try again.");
+                    return;
+                }
+            }
+
+            alert("Payment is still being processed. Please wait and check your payment status before trying again.");
+
+        } catch (error) {
+            alert("Payment error: " + error.message);
+        }
+
+        return;
+    }
+
+    // CASH OR BANK TRANSFER
+    lastOrderUrl =
+        "https://wa.me/" +
+        BUSINESS_WHATSAPP +
+        "?text=" + encodeURIComponent(message);
+
+    document.getElementById("waLink").href = lastOrderUrl;
+
+    document.querySelector("#done p").textContent =
+        "Your order is ready. Open WhatsApp and tap Send to place your order.";
+
+    showPage("done");
 });
-
-document.getElementById("orderType").addEventListener("change",toggleAddress);
-document.getElementById("paymentMethod").addEventListener("change",updatePaymentNote);
-
-const phoneLink=document.getElementById("contactPhone");
-phoneLink.textContent="+"+BUSINESS_WHATSAPP;
-phoneLink.href="tel:+"+BUSINESS_WHATSAPP;
-
-renderMenu();
-updateCart();
-toggleAddress();
-updatePaymentNote();
-
-</script>
-
-</body>
-</html>
