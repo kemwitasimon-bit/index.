@@ -1,35 +1,308 @@
 
-document.getElementById("orderForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Miyagi food place - Food Ordering</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#f5f5f5;color:#222}
+header{background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=70");background-size:cover;background-position:center;color:white;text-align:center;padding:60px 20px}
+nav{background:#124f34;padding:12px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+button,.btn{background:#176b45;color:white;border:0;padding:12px 16px;border-radius:6px;cursor:pointer}
+nav button{background:white;color:#176b45}
+section{display:none;padding:20px;max-width:1000px;margin:auto}
+section.active{display:block}
+.hero{background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),url("https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1400&q=70");background-size:cover;background-position:center;color:white;text-align:center;padding:90px 15px;border-radius:12px}
+.hero button{background:white;color:#176b45;font-weight:bold}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}
+.food{background:white;padding:12px;border-radius:10px;box-shadow:0 2px 7px #ddd}
+.food img{width:100%;height:150px;object-fit:cover;border-radius:8px}
+.price{color:#176b45;font-weight:bold}
+input,select,textarea{width:100%;padding:12px;margin:8px 0 15px;border:1px solid #ccc;border-radius:6px}
+.note{color:#555;font-size:14px}
+.cart-item{background:white;padding:12px;margin:10px 0;border-radius:8px}
+.total{font-size:20px;font-weight:bold}
+footer{background:#124f34;color:white;text-align:center;padding:20px;margin-top:30px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#124f34;color:white;padding:10px 18px;border-radius:20px;display:none}
+.toast.show{display:block}
+</style>
+</head>
+<body>
 
-    if (cart.length === 0) {
-        toast("Your cart is empty");
-        showPage("menu");
-        return;
-    }
+<header>
+<h1>🍽️ Miyagi food place</h1>
+<p>Fresh, Delicious and Affordable Meals</p>
+</header>
 
-    const name = document.getElementById("customerName").value.trim();
-    const phone = document.getElementById("customerPhone").value.trim();
-    const type = document.getElementById("orderType").value;
-    const address = document.getElementById("address").value.trim();
-    const payment = document.getElementById("paymentMethod").value;
-    const total = getTotal();
+<nav>
+<button onclick="showPage('home')">Home</button>
+<button onclick="showPage('menu')">Food Menu</button>
+<button onclick="showPage('cart')">Cart (<span id="cartCount">0</span>)</button>
+<button onclick="showPage('checkout')">Checkout</button>
+</nav>
 
-    const orderId = "MY" + Date.now().toString().slice(-8);
+<section id="home" class="active">
+<div class="hero">
+<h1>Welcome to Miyagi food place</h1>
+<p>Enjoy delicious meals prepared with care.</p>
+<button onclick="showPage('menu')">Order Now</button>
+</div>
+<h2>About Us</h2>
+<p>Miyagi food place provides tasty and affordable food. Browse our menu and order your favourite meals.</p>
+<h2>Our Location</h2>
+<p>Marimanti, Tharaka-Nithi, Kenya</p>
+<h2>Contact Us</h2>
+<p>Phone: <a id="contactPhone"></a></p>
+</section>
 
-    const order = cart.map(item => {
-        const food = foods.find(f => f.id === item.id);
-        return food
-            ? `${food.name} x ${item.quantity} = KSh ${food.price * item.quantity}`
-            : "";
-    }).filter(Boolean).join("\n");
+<section id="menu">
+<h2>Our Food Menu</h2>
+<div class="grid" id="foodGrid"></div>
+</section>
 
-    const message = `NEW MIYAGI FOOD PLACE ORDER
+<section id="cart">
+<h2>My Shopping Cart</h2>
+<div id="cartItems"></div>
+<p class="total" id="cartTotal">Total: KSh 0</p>
+<button onclick="showPage('menu')">Continue Shopping</button>
+<button onclick="showPage('checkout')">Checkout</button>
+</section>
+
+<section id="checkout">
+<h2>Checkout and Payment</h2>
+<div id="checkoutSummary"></div>
+<form id="orderForm">
+<label>Full Name</label>
+<input id="customerName" required placeholder="Enter your name">
+<label>Phone Number</label>
+<input id="customerPhone" required type="tel" placeholder="07XXXXXXXX">
+<label>Order Type</label>
+<select id="orderType">
+<option>Delivery</option>
+<option>Collection</option>
+</select>
+<div id="addressBox">
+<label>Delivery Address</label>
+<textarea id="address" placeholder="Enter your location"></textarea>
+</div>
+<label>Payment Method</label>
+<select id="paymentMethod">
+<option>M-Pesa</option>
+<option>Cash</option>
+<option>Bank Transfer</option>
+</select>
+<p class="note" id="paymentNote"></p>
+<button type="submit" id="placeOrderButton">Place Order</button>
+</form>
+</section>
+
+<section id="done">
+<h2>Almost done ✅</h2>
+<p id="doneMessage">Your order is ready.</p>
+<p><a class="btn" id="waLink" href="#" target="_blank" rel="noopener">Open WhatsApp</a></p>
+<p>Your cart stays saved until you confirm below.</p>
+<button onclick="finishOrder()">I've sent my order</button>
+</section>
+
+<footer>
+<p>© 2026 Miyagi food place. All Rights Reserved.</p>
+<p>Fresh Food | Great Taste | Best Service</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const BUSINESS_WHATSAPP = "254713073559";
+const BACKEND_URL = "https://mpesa-stk-backend-4.onrender.com";
+
+const foods = [
+{id:1,name:"Mandazi",price:20,img:"https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500"},
+{id:2,name:"Coffee",price:80,img:"https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500"},
+{id:3,name:"Githeri",price:100,img:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500"},
+{id:4,name:"Samosa",price:50,img:"https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?w=500"},
+{id:5,name:"Ugali & Samaki",price:300,img:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500"},
+{id:6,name:"Vegetables",price:100,img:"https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500"}
+];
+
+let lastOrderUrl="";
+let toastTimer;
+let cart=loadCart();
+
+function loadCart(){
+try{
+const saved=JSON.parse(localStorage.getItem("miyagiCart")||"[]");
+if(!Array.isArray(saved))return [];
+return saved.filter(i=>i&&Number.isInteger(i.quantity)&&i.quantity>0&&foods.some(f=>f.id===i.id));
+}catch(e){return [];}
+}
+
+function saveCart(){
+try{localStorage.setItem("miyagiCart",JSON.stringify(cart));}catch(e){}
+updateCart();
+}
+
+function toast(msg){
+const t=document.getElementById("toast");
+t.textContent=msg;
+t.classList.add("show");
+clearTimeout(toastTimer);
+toastTimer=setTimeout(()=>t.classList.remove("show"),2500);
+}
+
+function showPage(page){
+document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+document.getElementById(page).classList.add("active");
+if(page==="cart")renderCart();
+if(page==="checkout")renderCheckout();
+window.scrollTo(0,0);
+}
+
+function renderMenu(){
+document.getElementById("foodGrid").innerHTML=foods.map(food=>`
+<div class="food">
+<img src="${food.img}" alt="${food.name}">
+<h3>${food.name}</h3>
+<p class="price">KSh ${food.price}</p>
+<button onclick="addToCart(${food.id})">Add to Cart</button>
+</div>`).join("");
+}
+
+function addToCart(id){
+let item=cart.find(x=>x.id===id);
+if(item)item.quantity++;
+else cart.push({id:id,quantity:1});
+saveCart();
+toast(foods.find(f=>f.id===id).name+" added to cart");
+}
+
+function changeQuantity(id,amount){
+let item=cart.find(x=>x.id===id);
+if(!item)return;
+item.quantity+=amount;
+cart=cart.filter(x=>x.quantity>0);
+saveCart();
+renderCart();
+}
+
+function removeItem(id){
+cart=cart.filter(x=>x.id!==id);
+saveCart();
+renderCart();
+}
+
+function getTotal(){
+return cart.reduce((sum,item)=>{
+let food=foods.find(f=>f.id===item.id);
+return sum+(food?food.price*item.quantity:0);
+},0);
+}
+
+function updateCart(){
+document.getElementById("cartCount").textContent=
+cart.reduce((sum,item)=>sum+item.quantity,0);
+}
+
+function renderCart(){
+let container=document.getElementById("cartItems");
+if(cart.length===0){
+container.innerHTML="<p>Your cart is empty.</p>";
+}else{
+container.innerHTML=cart.map(item=>{
+let food=foods.find(f=>f.id===item.id);
+if(!food)return "";
+return `<div class="cart-item">
+<strong>${food.name}</strong><br>
+KSh ${food.price} × ${item.quantity}
+<p>
+<button onclick="changeQuantity(${food.id},1)">+</button>
+<button onclick="changeQuantity(${food.id},-1)">-</button>
+<button onclick="removeItem(${food.id})">Remove</button>
+</p></div>`;
+}).join("");
+}
+document.getElementById("cartTotal").textContent="Total: KSh "+getTotal();
+}
+
+function renderCheckout(){
+let summary=document.getElementById("checkoutSummary");
+if(cart.length===0){
+summary.innerHTML="<p>Your cart is empty. Please add food first.</p>";
+return;
+}
+summary.innerHTML=`<h3>Order Summary</h3>
+${cart.map(item=>{
+let food=foods.find(f=>f.id===item.id);
+return food?`<p>${food.name} × ${item.quantity} = KSh ${food.price*item.quantity}</p>`:"";
+}).join("")}
+<p class="total">Total: KSh ${getTotal()}</p>`;
+}
+
+function toggleAddress(){
+const delivery=document.getElementById("orderType").value==="Delivery";
+document.getElementById("addressBox").style.display=delivery?"block":"none";
+document.getElementById("address").required=delivery;
+}
+
+function updatePaymentNote(){
+const method=document.getElementById("paymentMethod").value;
+let note="";
+if(method==="M-Pesa")note="An M-Pesa payment prompt will be sent to your phone.";
+else if(method==="Cash")note="Pay in cash when your order arrives or when you collect it.";
+else note="We will send our bank details on WhatsApp.";
+document.getElementById("paymentNote").textContent=note;
+}
+
+function finishOrder(){
+cart=[];
+saveCart();
+document.getElementById("orderForm").reset();
+toggleAddress();
+updatePaymentNote();
+showPage("home");
+toast("Thank you for your order!");
+}
+
+function formatPhone(phone){
+let number=phone.replace(/\D/g,"");
+if(number.startsWith("0"))number="254"+number.substring(1);
+if(number.startsWith("7")||number.startsWith("1"))number="254"+number;
+if(!/^254[17]\d{8}$/.test(number)){
+throw new Error("Enter a valid Kenyan phone number, for example 0712345678.");
+}
+return number;
+}
+
+document.getElementById("orderForm").addEventListener("submit",async function(e){
+e.preventDefault();
+
+if(cart.length===0){
+toast("Your cart is empty");
+showPage("menu");
+return;
+}
+
+const button=document.getElementById("placeOrderButton");
+const name=document.getElementById("customerName").value.trim();
+const phone=document.getElementById("customerPhone").value.trim();
+const type=document.getElementById("orderType").value;
+const address=document.getElementById("address").value.trim();
+const payment=document.getElementById("paymentMethod").value;
+const total=getTotal();
+const orderId="MY"+Date.now().toString().slice(-8);
+
+const order=cart.map(item=>{
+const food=foods.find(f=>f.id===item.id);
+return food?`${food.name} x ${item.quantity} = KSh ${food.price*item.quantity}`:"";
+}).filter(Boolean).join("\n");
+
+const message=`NEW MIYAGI FOOD PLACE ORDER
 Order ID: ${orderId}
 Name: ${name}
 Customer Phone: ${phone}
 Order Type: ${type}
-Address: ${type === "Delivery" ? address : "Collection"}
+Address: ${type==="Delivery"?address:"Collection"}
 Payment: ${payment}
 
 ORDER:
@@ -37,101 +310,101 @@ ${order}
 
 TOTAL: KSh ${total}`;
 
-    // M-PESA PAYMENT
-    if (payment === "M-Pesa") {
+if(payment==="M-Pesa"){
+let mpesaPhone;
+try{mpesaPhone=formatPhone(phone);}
+catch(error){alert(error.message);return;}
 
-        toast("Sending M-Pesa payment request...");
+button.disabled=true;
+button.textContent="Sending payment request...";
 
-        try {
-            const response = await fetch(
-                "https://mpesa-stk-backend-4.onrender.com/stkpush",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        phone: phone,
-                        amount: total,
-                        orderId: orderId
-                    })
-                }
-            );
-
-            const result = await response.json();
-
-            if (!response.ok || result.success === false) {
-                throw new Error(result.message || "STK Push failed");
-            }
-
-            const checkoutId =
-                result.checkoutRequestId ||
-                result.data?.CheckoutRequestID ||
-                result.data?.checkoutRequestId;
-
-            if (!checkoutId) {
-                throw new Error("Payment request ID was not returned");
-            }
-
-            alert("Payment request sent! Check your phone and enter your M-Pesa PIN.");
-
-            // CHECK PAYMENT STATUS
-            for (let i = 0; i < 40; i++) {
-
-                await new Promise(resolve => setTimeout(resolve, 3000));
-
-                const statusResponse = await fetch(
-                    "https://mpesa-stk-backend-4.onrender.com/payment-status/" +
-                    encodeURIComponent(checkoutId)
-                );
-
-                const statusData = await statusResponse.json();
-
-                const status = String(statusData.status || "").toUpperCase();
-
-                if (status === "PAID") {
-
-                    lastOrderUrl =
-                        "https://wa.me/" +
-                        BUSINESS_WHATSAPP +
-                        "?text=" + encodeURIComponent(
-                            message + "\n\nPAYMENT: CONFIRMED"
-                        );
-
-                    document.getElementById("waLink").href = lastOrderUrl;
-
-                    document.querySelector("#done p").textContent =
-                        "M-Pesa payment confirmed! Tap below to send your order to Miyagi Food Place on WhatsApp.";
-
-                    showPage("done");
-                    return;
-                }
-
-                if (status === "FAILED") {
-                    alert("M-Pesa payment failed or was cancelled. Please try again.");
-                    return;
-                }
-            }
-
-            alert("Payment is still being processed. Please wait and check your payment status before trying again.");
-
-        } catch (error) {
-            alert("Payment error: " + error.message);
-        }
-
-        return;
-    }
-
-    // CASH OR BANK TRANSFER
-    lastOrderUrl =
-        "https://wa.me/" +
-        BUSINESS_WHATSAPP +
-        "?text=" + encodeURIComponent(message);
-
-    document.getElementById("waLink").href = lastOrderUrl;
-
-    document.querySelector("#done p").textContent =
-        "Your order is ready. Open WhatsApp and tap Send to place your order.";
-
-    showPage("done");
+try{
+const response=await fetch(BACKEND_URL+"/stkpush",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+phone:mpesaPhone,
+amount:total,
+orderId:orderId
+})
 });
+
+const result=await response.json();
+if(!response.ok||result.success===false){
+throw new Error(result.message||"Could not send M-Pesa request.");
+}
+
+const checkoutId=
+result.checkoutRequestId||
+result.data?.CheckoutRequestID||
+result.data?.checkoutRequestId;
+
+if(!checkoutId){
+throw new Error("The backend did not return a payment request ID.");
+}
+
+alert("M-Pesa request sent. Check your phone and enter your M-Pesa PIN if you wish to pay.");
+
+for(let i=0;i<40;i++){
+await new Promise(resolve=>setTimeout(resolve,3000));
+
+const statusResponse=await fetch(
+BACKEND_URL+"/payment-status/"+encodeURIComponent(checkoutId)
+);
+
+if(!statusResponse.ok){
+throw new Error("Unable to check payment status. Please try again later.");
+}
+
+const statusData=await statusResponse.json();
+const status=String(statusData.status||"").toUpperCase();
+
+if(status==="PAID"||status==="SUCCESS"){
+lastOrderUrl="https://wa.me/"+BUSINESS_WHATSAPP+
+"?text="+encodeURIComponent(message+"\n\nPAYMENT: CONFIRMED");
+document.getElementById("waLink").href=lastOrderUrl;
+document.getElementById("doneMessage").textContent=
+"M-Pesa payment confirmed! Open WhatsApp and tap Send to submit your order.";
+showPage("done");
+return;
+}
+
+if(status==="FAILED"){
+throw new Error("Payment failed or was cancelled. You can try again.");
+}
+}
+
+alert("Payment is still pending. Do not pay again until you have checked the payment status.");
+return;
+
+}catch(error){
+alert("M-Pesa error: "+error.message);
+return;
+}finally{
+button.disabled=false;
+button.textContent="Place Order";
+}
+}
+
+lastOrderUrl="https://wa.me/"+BUSINESS_WHATSAPP+
+"?text="+encodeURIComponent(message);
+document.getElementById("waLink").href=lastOrderUrl;
+document.getElementById("doneMessage").textContent=
+"Your order is ready. Open WhatsApp and tap Send to place your order.";
+showPage("done");
+});
+
+document.getElementById("orderType").addEventListener("change",toggleAddress);
+document.getElementById("paymentMethod").addEventListener("change",updatePaymentNote);
+
+const phoneLink=document.getElementById("contactPhone");
+phoneLink.textContent="+"+BUSINESS_WHATSAPP;
+phoneLink.href="tel:+"+BUSINESS_WHATSAPP;
+
+renderMenu();
+updateCart();
+toggleAddress();
+updatePaymentNote();
+</script>
+</body>
+</html>
